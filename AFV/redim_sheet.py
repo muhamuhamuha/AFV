@@ -5,6 +5,7 @@ from dataclasses import (
 )
 from typing import (
     TypeVar,
+    Optional,
 )
 
 xwBook = TypeVar('xw.main.book')
@@ -12,14 +13,22 @@ xwSheet = TypeVar('xw.main.Sheet')
 xwRange = TypeVar('xw.main.Range')
 
 @dataclass
-class UsedRange:
+class SheetDims:
     sheet: xwSheet = field(repr=False)
-
+    leftmost: Optional(str) = field(init=False)
+    topmost: Optional(int) = field(init=False)
+    
     def __post_init__(self):
-        self.down: xwRange = self.sheet['A1048576'].end('up')
-        self.right: xwRange = self.sheet['XFD1'].end('left')
+        if leftmost:
+            self.down: xwRange = self.sheet[self.leftmost + '1048576'].end('up')
+        elif topmost:
+            self.right: xwRange = self.sheet['XFD' + str(topmost)].end('left')
+        else:
+            self.down: xwRange = self.sheet['A1048576'].end('up')
+            self.right: xwRange = self.sheet['XFD1'].end('left')
+
         self.bottomright: xwRange = self.right.offset(self.down.row - 1, 0)
-        self.whole: xwRange = self.sheet['A1:' + self.bottomright.address]
+        self.digest: xwRange = self.sheet['A1:' + self.bottomright.address]
         
     @property
     def down(self) -> xwRange:
@@ -34,8 +43,8 @@ class UsedRange:
         return self.bottomright
 
     @property
-    def whole(self) -> xwRange:
-        return self.whole
+    def digest(self) -> xwRange:
+        return self.digest
 
     @property
     def d_row(self) -> str:
@@ -62,8 +71,8 @@ class UsedRange:
         return self.bottomright.address
 
     @property
-    def w_add(self) -> str:
-        return self.whole.address
+    def digest_add(self) -> str:
+        return self.digest.address
 
 
     

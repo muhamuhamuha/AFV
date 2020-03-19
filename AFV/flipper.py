@@ -1,20 +1,13 @@
 import re
-import xlwings as xw
 import pandas as pd
-from pathlib import Path
 from datetime import datetime
-from openpyxl.utils import (
-    get_column_letter as col_letter
-)
 from dataclasses import (
     dataclass,
     field,
 )
 from typing import (
     List,
-    Dict,
     TypeVar,
-    Callable,
     Tuple,
 )
 
@@ -24,12 +17,8 @@ from AFV.redim_sheet import *  # contains 3 xw TypeVars & SheetDims class
 pdDataFrame = TypeVar('pd.main.frame.DataFrame')
 pdSeries = TypeVar('pd.core.series.Series')
 
-def redefine_sheets(b: xwBook = xw.books.active) -> Dict[str, xwSheet]:
-    return {s.name: s for s in b.sheets}
-
-
 @dataclass
-class CleanFlip:
+class _FlippedClean:
     totals: xwSheet = field(repr=False)
 
     def __post_init__(self):
